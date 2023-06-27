@@ -38,12 +38,13 @@ resource "aws_security_group" "http_server_sg" {
   }
 }
 
-resource "aws_instance" "http_server" {
+resource "aws_instance" "http_servers" {
   ami                    = data.aws_ami.aws_linux_2_latest.id
   key_name               = "default-ec2"
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.http_server_sg.id]
-  subnet_id              = data.aws_subnets.default_subnets.ids[0]
+  for_each               = data.aws_subnets.default_subnets.ids
+  subnet_id              = each.value
   connection {
     type        = "ssh"
     host        = self.public_ip
